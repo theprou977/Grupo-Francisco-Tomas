@@ -1,29 +1,111 @@
-create database mecapp;
-use mecapp;
+CREATE DATABASE mecapp;
 
-create table tipos_direccion(
-    id_tipo_direccion integer auto_increment,
-    tipo_direccion varchar(25) not null,
-    detalle varchar(20) null,
-    habilitado tinyint not null default 1,
-constraint pk_tipos_direccion primary key (id_tipo_direccion)
+USE mecapp;
+
+CREATE TABLE tipos_direccion(
+    id_tipo_direccion INTEGER AUTO_INCREMENT,
+    tipo_direccion VARCHAR(25) NOT NULL,
+    detalle VARCHAR(50) NULL,
+    habilitado TINYINT NOT NULL DEFAULT 1
+
+    CONSTRAINT pk_tipo_direccion PRIMARY KEY (id_tipos_direccion)
 );
 
-create table comunas(
-    id_comuna integer auto_increment,
-    codigo_comuna varchar(5) not null unique,
-    nombre_comuna varchar(30) not null,
-    constraint pk_comunas primary key (id_comuna)
+CREATE TABLE comunas(
+    id_comuna INTEGER AUTO_INCREMENT,
+    codigo_comuna VARCHAR(5) NOT NULL,
+    nombre_comuna VARCHAR(30) NOT NULL,
+
+    CONSTRAINT pk_comunas PRIMARY KEY (id_comunas)
+);    
+
+CREATE TABLE direcciones(
+    id_direccion INTEGER AUTO_INCREMENT,
+    comuna INTEGER NOT NULL,
+    calle VARCHAR(50) NOT NULL,
+    numero VARCHAR(5) NULL,
+    departamento VARCHAR(5) NULL,
+    tipo_direccion INTEGER NULL,
+
+    CONSTRAINT pk_direcciones PRIMARY KEY (id_direccion),
+    CONSTRAINT pf_direcciones_comunas FOREING KEY (comuna) REFERENCES comunas(id_comuna),
+    CONSTRAINT fk_direcciones_tipos_direccion FOREING KEY (tipo_direccion) references tipo_direccion(id_tipo_direccion)
 );
 
-create table direcciones(
-    id_direccion integer auto_increment,
-    comuna integer not null,
-    calle varchar(50) not null,
-    numero varchar(5) null,
-    departamento varchar(5) null,
-    tipo_direccion integer null,
-    constraint pk_direcciones primary key (id_direccion),
-    constraint fk_direcciones_comunas foreign key (comuna) references comunas(id_comuna),
-    constraint fk_direcciones_tipos_direccion foreign key (tipo_direccion) references tipos_direccion(id_tipo_direccion)      
-)
+
+CREATE TABLE talleres(
+    id_taller INTEGER AUTO_INCREMENT,
+    nombre_taller VARCHAR(50) NOT NULL,
+    direccion INTEGER NOT NULL,
+    habilitado TINYINT NOT NULL DEFAULT 1,
+)   COMMENT = 'informacion talleres mecanicos';
+
+CREATE TABLE tipos_mecanico(
+    id_tipos_mecanico INTEGER AUTO_INCREMENT,
+    tipo_mecanico VARCHAR(25) NOT NULL,
+    detalle VARCHAR(50) NULL,
+    habilitado  TINYINT NOT NULL DEFAULT 1,
+
+);
+
+CREATE TABLE mecanico(
+    rut INTEGER NOT NULL UNIQUE,
+    digito_verificador char(1) NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(250) NULL,
+    telefono VARCHAR(15) NULL,
+    fecha_nacimiento DATE NOT NULL,
+    fecha_contrato DATE NOT NULL,
+    salario DECIMAL NULL,
+    direccion INTEGER NULL,
+    tipo_mecanico INTEGER NULL,
+    
+    CONSTRAINT pk_mecanicos PRIMARY KEY (rut),
+    CONSTRAINT fk_mecanicos_direcciones FOREING KEY (direccion) REFERENCES direcciones(id_direccion)
+    CONSTRAINT fk_mecanicos_tiposmecanico foreing KEY (tipo_mecanico) REFERENCES tipos_mecanico(id_tipos_mecanico)
+);
+
+CREATE TABLE talleres_mecanicos(
+    id_taller_mecanico INTEGER AUTO_INCREMENT,
+    mecanico INTEGER NOT NULL,
+    taller INTEGER NOT NULL,
+    habilitado TINYINT NOT NULL DEFAULT 1,
+
+    CONSTRAINT pk_talleres_mecanicos PRIMARY KEY (id_taller_mecanico),
+    CONSTRAINT fk_talleresmecanicos_taller foreing KEY (taller) REFERENCES talleres(id_taller),
+    CONSTRAINT fk_talleresmecanico_ mecanico FOREING KEY (mecanico) REFERENCES mecanicos(rut)
+);
+
+CREATE TABLE parametros(
+    id_parametro INTEGER AUTO_INCREMENT,
+    tipo_parametro VARCHAR(30) NOT NULL,
+    descripcion VARCHAR(100) NOT NULL,
+
+    CONSTRAINT pf_parametros PRIMARY KEY (id_parametro)
+) COMMENT = 'informacion parametrica usada dentro de la aplicacion, combustible, tipo de vehiculo, etc'
+
+ALTER TABLE parametros ADD habilitado TINYINT NOT NULL DEFAULT 1;
+
+
+
+
+
+INSERT INTO parametros(tipo_parametro, descripcion) VALUES
+('COMBUSTIBLE', '93 octanos')
+('COMBUSTIBLE', '95 octanos')
+('COMBUSTIBLE', '97 octanos')
+('COMBUSTIBLE', 'Diesel')
+('COMBUSTIBLE', 'parafina')
+('COMBUSTIBLE', 'alcohol')
+('COMBUSTIBLE', 'Bio-diesel')
+('COMBUSTIBLE', 'electricidad')
+('COMBUSTIBLE', 'gas licuado')
+('tipo de vehiculo', 'City car')
+('tipo de vehiculo', 'hatshback')
+('tipo de vehiculo', 'Csedan')
+('tipo de vehiculo', 'SUV')
+('tipo de vehiculo', 'Crossover')
+('tipo de vehiculo', 'camioneta')
+('tipo de vehiculo', 'Van')
+('tipo de vehiculo', 'transporte de pasajeros')
+('tipo de vehiculo', 'transporte de cargas')
